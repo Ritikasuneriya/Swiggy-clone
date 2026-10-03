@@ -253,18 +253,18 @@ To enable Jenkins to authenticate and push the built Docker image to DockerHub:
 
 ### 📄 Declarative Jenkinsfile:
 
-```groovy
+``` groovy
 pipeline {
     agent any
 
     tools {
         jdk 'jdk17'
-        nodejs 'node20'   // Node.js 20 LTS
+        nodejs 'node23'   // Node.js 20 LTS
     }
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
-        DOCKER_IMAGE = 'sandeepallakonda/swiggy'
+        DOCKER_IMAGE = 'saksham022/swiggy'
         DOCKER_TAG   = 'latest'
     }
 
@@ -277,8 +277,8 @@ pipeline {
 
         stage('Checkout from Git') {
             steps {
-                git branch: 'master', 
-                    url: 'https://github.com/NotHarshhaa/DevOps-Projects/tree/master/DevOps-Project-41/DevOps-Project-Swiggy'
+                git branch: 'main', 
+                    url: 'https://github.com/Ritikasuneriya/Swiggy-clone.git'
             }
         }
 
@@ -298,7 +298,7 @@ pipeline {
         stage('Quality Gate') {
             steps {
                 script {
-                    timeout(time: 2, unit: 'MINUTES') {
+                    timeout(time: 3, unit: 'MINUTES') {
                         waitForQualityGate abortPipeline: true
                     }
                 }
@@ -307,7 +307,10 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh "npm install"
+                 sh '''
+                cd DevOps-Project-Swiggy
+                npm install
+               '''
             }
         }
 
@@ -321,8 +324,10 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-creds', toolName: 'docker') {
+                    withDockerRegistry(credentialsId: 'Dockerduckku') {
                         sh """
+                            cd DevOps-Project-Swiggy
+                            
                             docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} .
                             docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
                         """
